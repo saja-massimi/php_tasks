@@ -26,31 +26,159 @@
 <body>
 
     <h1>Sign Up</h1>
-    <p>Create an Account ,its free</p>
+    <p>Create an Account, it's free</p>
 
     <?php
+    session_start();
+    $errors = [];
+    function validateEmail($email)
+    {
+        return filter_var($email, FILTER_VALIDATE_EMAIL);
+    }
 
+    function validateMobile($mobile)
+    {
+        return preg_match("/^\d{14}$/", $mobile);
+    }
+
+    function validatePassword($password)
+    {
+        return strlen($password) >= 8 &&
+            preg_match('/[A-Z]/', $password) &&    // upper case
+            preg_match('/[a-z]/', $password) &&    // lower case
+            preg_match('/\d/', $password) &&       // numbers
+            preg_match('/[\W]/', $password) &&     // special character
+            !preg_match('/\s/', $password);        // no spaces
+    }
+
+    function confirmPassword($password, $confirmPassword)
+    {
+        return $password === $confirmPassword;
+    }
+
+    function validateDOB($dob)
+    {
+        $dobDate = new DateTime($dob);
+        $today = new DateTime();
+        $age = $today->diff($dobDate)->y;
+        return $age >= 16;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $email = $_POST['email'] ?? '';
+        $mobile = $_POST['phoneNum'] ?? '';
+        $fullName = $_POST['fullName'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirmPassword'] ?? '';
+        $dob = $_POST['dob'] ?? '';
+
+        if (!$email || !validateEmail($email)) {
+            $errors['email'] = "Please enter a valid email address.";
+        }
+
+        if (!$mobile || !validateMobile($mobile)) {
+            $errors['phoneNum'] = "Please enter a valid 14-digit mobile number.";
+        }
+
+        if (!$fullName || !preg_match("/^[a-zA-Z\s]+$/", $fullName)) {
+            $errors['fullName'] = "Please enter a valid full name.";
+        }
+
+        if (!$password || !validatePassword($password)) {
+            $errors['password'] = "Password must be at least 8 characters, include uppercase, lowercase, numbers, and special characters.";
+        }
+
+        if (!confirmPassword($password, $confirmPassword)) {
+            $errors['confirmPassword'] = "Passwords do not match.";
+        }
+
+        if (!$dob || !validateDOB($dob)) {
+            $errors['dob'] = "You must be 16 years or older to register.";
+        }
+
+        if (empty($errors)) {
+            $newUser = [
+                "email" => $email,
+                "phoneNum" => $mobile,
+                "fullName" => $fullName,
+                "password" => $password,
+                "dob" => $dob,
+            ];
+
+            $_SESSION['users'][] = $newUser;
+
+            echo "<p class='text-success text-center'>Registration successful!</p>";
+            header("Location: login.php");
+            exit();
+        }
+    }
     ?>
+
     <main>
         <form method="post">
 
             <div class="form-group">
                 <label for="exampleInputEmail1">Email</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-                    placeholder="Enter email">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone
-                    else.</small>
+
+                <input type="email" name="email"
+                    class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>"
+                    id="exampleInputEmail1" placeholder="Enter email" value="<?php echo $_POST['email'] ?? ''; ?>">
+
+                <div class="invalid-feedback">
+                    <?php echo $errors['email'] ?? ''; ?>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNum">Phone Number</label>
+                <input type="number" name="phoneNum"
+                    class="form-control <?php echo isset($errors['phoneNum']) ? 'is-invalid' : ''; ?>" id="phoneNum"
+                    placeholder="Phone Number" value="<?php echo $_POST['phoneNum'] ?? ''; ?>">
+                <div class="invalid-feedback">
+                    <?php echo $errors['phoneNum'] ?? ''; ?>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" name="fullName"
+                    class="form-control <?php echo isset($errors['fullName']) ? 'is-invalid' : ''; ?>" id="fullName"
+                    placeholder="Full Name" value="<?php echo $_POST['fullName'] ?? ''; ?>">
+                <div class="invalid-feedback">
+                    <?php echo $errors['fullName'] ?? ''; ?>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+                <input type="password" name="password"
+                    class="form-control <?php echo isset($errors['password']) ? 'is-invalid' : ''; ?>"
+                    id="exampleInputPassword1" placeholder="Password">
+                <div class="invalid-feedback">
+                    <?php echo $errors['password'] ?? ''; ?>
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password">
+                <input type="password" name="confirmPassword"
+                    class="form-control <?php echo isset($errors['confirmPassword']) ? 'is-invalid' : ''; ?>"
+                    id="confirmPassword" placeholder="Confirm Password">
+                <div class="invalid-feedback">
+                    <?php echo $errors['confirmPassword'] ?? ''; ?>
+                </div>
             </div>
+
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" name="dob"
+                    class="form-control <?php echo isset($errors['dob']) ? 'is-invalid' : ''; ?>" id="dob"
+                    value="<?php echo $_POST['dob'] ?? ''; ?>">
+                <div class="invalid-feedback">
+                    <?php echo $errors['dob'] ?? ''; ?>
+                </div>
+            </div>
+
             <br>
             <button type="submit" class="btn btn-danger">Submit</button>
             <p>Already have an account? <strong><a href="login.php">Login</a></strong></p>
