@@ -24,6 +24,9 @@
 </head>
 
 <body>
+    <?php
+    
+    ?>
     <main>
         <h1>Login</h1>
         <p>Welcome Back</p>

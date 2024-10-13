@@ -44,11 +44,11 @@
     function validatePassword($password)
     {
         return strlen($password) >= 8 &&
-            preg_match('/[A-Z]/', $password) &&    // upper case
-            preg_match('/[a-z]/', $password) &&    // lower case
-            preg_match('/\d/', $password) &&       // numbers
-            preg_match('/[\W]/', $password) &&     // special character
-            !preg_match('/\s/', $password);        // no spaces
+            preg_match('/[A-Z]/', $password) &&    
+            preg_match('/[a-z]/', $password) &&   
+            preg_match('/\d/', $password) &&       
+            preg_match('/[\W]/', $password) &&     
+            !preg_match('/\s/', $password);        
     }
 
     function confirmPassword($password, $confirmPassword)
@@ -121,7 +121,7 @@
                 <label for="exampleInputEmail1">Email</label>
 
                 <input type="email" name="email"
-                    class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>"
+                    class="form-control "
                     id="exampleInputEmail1" placeholder="Enter email" value="<?php echo $_POST['email'] ?? ''; ?>">
 
                 <div class="invalid-feedback">
@@ -132,7 +132,7 @@
             <div class="form-group">
                 <label for="phoneNum">Phone Number</label>
                 <input type="number" name="phoneNum"
-                    class="form-control <?php echo isset($errors['phoneNum']) ? 'is-invalid' : ''; ?>" id="phoneNum"
+                    class="form-control" id="phoneNum"
                     placeholder="Phone Number" value="<?php echo $_POST['phoneNum'] ?? ''; ?>">
                 <div class="invalid-feedback">
                     <?php echo $errors['phoneNum'] ?? ''; ?>
@@ -142,7 +142,7 @@
             <div class="form-group">
                 <label for="fullName">Full Name</label>
                 <input type="text" name="fullName"
-                    class="form-control <?php echo isset($errors['fullName']) ? 'is-invalid' : ''; ?>" id="fullName"
+                    class="form-control" id="fullName"
                     placeholder="Full Name" value="<?php echo $_POST['fullName'] ?? ''; ?>">
                 <div class="invalid-feedback">
                     <?php echo $errors['fullName'] ?? ''; ?>
@@ -152,7 +152,7 @@
             <div class="form-group">
                 <label for="exampleInputPassword1">Password</label>
                 <input type="password" name="password"
-                    class="form-control <?php echo isset($errors['password']) ? 'is-invalid' : ''; ?>"
+                    class="form-control"
                     id="exampleInputPassword1" placeholder="Password">
                 <div class="invalid-feedback">
                     <?php echo $errors['password'] ?? ''; ?>
