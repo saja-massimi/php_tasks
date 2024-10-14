@@ -22,7 +22,7 @@
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'] ?? '';
         $password = trim($_POST['pass'] ?? '');
-      
+
 
         if (!$email || !$password) {
             $error = "Please enter both email and password.";
@@ -39,18 +39,18 @@
                 if (!$user) {
                     $error = "Invalid email or password.";
                 } else {
-                   
-                   
+
+
                     if (password_verify($password, $user['password'])) {
-                       
+
                         $_SESSION['user'] = $user['name'];
                         $_SESSION['user_email'] = $user['email'];
 
                         header('location: profile.php');
-                       exit;
+                        exit;
                     } else {
                         echo "Not verified";
-                        $error = "Invalid email or password."; 
+                        $error = "Invalid email or password.";
                     }
                 }
             } catch (PDOException $e) {

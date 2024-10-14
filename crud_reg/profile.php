@@ -11,11 +11,13 @@
 </head>
 
 <body>
+
     <?php
 
     require 'db_connection.php';
     session_start();
     $username = $_SESSION['user'];
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['profile_pic'])) {
         $uploadDir = 'uploads/';
         $uploadFile = $uploadDir . basename($_FILES['profile_pic']['name']);
@@ -31,7 +33,6 @@
 
                         try {
                             $dbConn = getDBConnection();
-
 
                             $sql = "UPDATE users SET profilePic = :profilePic WHERE name = :username";
                             $stmt = $dbConn->prepare($sql);
@@ -74,13 +75,11 @@
                         $dbConn = getDBConnection();
                         $userId = $_SESSION['user_id'];
 
-                        // Update the CV file path for the current user
                         $sql = "UPDATE users SET cv = :cvFile WHERE name = :username";
                         $stmt = $dbConn->prepare($sql);
                         $stmt->execute([
                             ':cvFile' => $_SESSION['cv_file'],
                             ':username' => $username
-
                         ]);
                     } catch (PDOException $e) {
                         echo "Error: " . $e->getMessage();
@@ -100,7 +99,30 @@
         }
     }
 
- 
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['name']) && isset($_POST['email'])) {
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+
+        try {
+            $dbConn = getDBConnection();
+
+            $sql = "UPDATE users SET name = :name, email = :email WHERE name = :username";
+            $stmt = $dbConn->prepare($sql);
+            $stmt->execute([
+                ':name' => $name,
+                ':email' => $email,
+                ':username' => $username
+            ]);
+
+            $_SESSION['user'] = $name;
+            $_SESSION['user_email'] = $email;
+
+            header("Location: profile.php");
+            exit;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+        }
+    }
 
     ?>
 
@@ -130,21 +152,25 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="text-right">Profile Settings</h4>
                     </div>
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <label class="labels">Name</label>
-                            <input type="text" class="form-control" placeholder="First name" value="<?php echo $_SESSION['user'] ?>">
+
+                    <form method="POST">
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label class="labels">Name</label>
+                                <input type="text" class="form-control" name="name" placeholder="First name" value="<?php echo $_SESSION['user'] ?>">
+                            </div>
                         </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-md-12">
-                            <label class="labels">Email</label>
-                            <input type="text" class="form-control" value="<?php echo $_SESSION['user_email'] ?>">
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label class="labels">Email</label>
+                                <input type="text" class="form-control" name="email" value="<?php echo $_SESSION['user_email'] ?>">
+                            </div>
                         </div>
-                    </div>
-                    <div class="mt-5 text-center">
-                        <button class="btn btn-primary profile-button" type="button">Save Profile</button>
-                    </div>
+
+                        <div class="mt-5 text-center">
+                            <button class="btn btn-primary profile-button" type="submit">Save Profile</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -160,7 +186,6 @@
                     </div>
                 </div>
             </div>
-
 
         </div>
     </div>

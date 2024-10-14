@@ -32,8 +32,10 @@ body {
     cursor: pointer
 }
 
-.labels {
-    font-size: 11px
+.labels,
+label {
+    font-size: 11px;
+    color: #f0f0f0;
 }
 
 .add-experience:hover {
